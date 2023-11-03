@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure-zg_j401*=_k+!e&8reivw$l8h1g=4iokh1n%$ghas2b89on049
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = ["*"]
 
 
 
@@ -52,12 +52,15 @@ TENANT_TYPES = {
             'django.contrib.sessions',
             'django.contrib.messages',
             'django.contrib.staticfiles',
+            'debug_toolbar',
 
             'frontend'
 
             ],
         "URLCONF": "core.urls",
     },
+    
+
 }
 
 INSTALLED_APPS = []
@@ -65,11 +68,39 @@ for schema in TENANT_TYPES:
     INSTALLED_APPS += [app for app in TENANT_TYPES[schema]["APPS"] if app not in INSTALLED_APPS]
 
 
-TENANT_MODEL = "frontend.Client" # app.Model
+TENANT_MODEL = "frontend.Client"
 
 TENANT_DOMAIN_MODEL = "frontend.Domain"
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,9 +110,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+
 ]
 
-ROOT_URLCONF = ''
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -161,8 +195,30 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static_files'
-STATICFILES_DIRS = [os.path.join('static')]
+STATIC_ROOT = BASE_DIR / 'static_files'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend/static')]
+
+
+
+
+"""
+Start of Emailing Section
+"""
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# # EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+# EMAIL_HOST = env('EMAIL_HOST')
+# EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+# EMAIL_PORT = env('EMAIL_PORT')
+# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+# EMAIL_USE_SSL = True
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# EMAIL_TIMEOUT = 10
+# FCM_API_KEY = env('FCM_API_KEY')
+
+"""
+End Of Emailing Section
+"""
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -2,13 +2,13 @@ version: '3.2'
 
 services:
   db:
-    image: postgres:14-alpine
+    image: postgres:15
     env_file:
-      - .env
+      - ./.env.dev
     ports:
       - "5432:5432"
     volumes:
-      - cms_data:/var/lib/postgresql/cms/data
+      - scm_data:/var/lib/postgresql/scm/data
 
   frontend:
     build:
@@ -29,8 +29,13 @@ services:
       - frontend
       - db
 
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+
     volumes:
       - .:/app/backend
 
 volumes:
-  cms_data:
+  scm_data:

@@ -1,24 +1,27 @@
-FROM python:3.8-alpine
-
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
+FROM python:3.8
 
 WORKDIR /app/backend
 
-COPY requirements.txt /app/backend/
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Build psycopg2-binary from source -- add required required dependencies
-RUN apk add --virtual .build-deps --no-cache postgresql-dev gcc python3-dev musl-dev && \
-        pip install --no-cache-dir -r requirements.txt && \
-        apk --purge del .build-deps
+# install system dependencies
+RUN apt-get update && apt-get upgrade
+
+# install dependencies
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip install -r requirements.txt
 
 # copy entrypoint.sh
-COPY ./entrypoint.sh ./app/backend/
-RUN sed -i 's/\r$//g' ./app/backend/entrypoint.sh
-RUN chmod +x ./app/backend/entrypoint.sh
+COPY entrypoint.sh /app/backend/
+RUN sed -i 's/\r$//g' /app/backend/entrypoint.sh
+RUN chmod +x /app/backend/entrypoint.sh
 
+# Copy the rest of the application code
 COPY . /app/backend/
 
-CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+CMD [ "python3", "manage.py", "runserver", "0.0.0.0:8000" ]
 
 ENTRYPOINT ["/app/backend/entrypoint.sh"]
